@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="ClipboardInspector.Cli/ClipboardInspector.Cli.csproj" />
+  <Project Path="ClipboardInspector.Core/ClipboardInspector.Core.csproj" />
+  <Project Path="ClipboardInspector.Tests/ClipboardInspector.Tests.csproj" />
+</Solution>
