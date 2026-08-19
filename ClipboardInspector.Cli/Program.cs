@@ -1,10 +1,12 @@
-﻿namespace ClipboardInspector.Cli
+﻿using ClipboardInspector.Core;
+using System.Runtime.CompilerServices;
+namespace ClipboardInspector.Cli;
+
+internal class Program
 {
-    internal class Program
+    private static void Main()
     {
-        static void Main(string[] args)
-        {
-            Console.WriteLine("Hello, World!");
-        }
+        Console.WriteLine(InspectionService.GetClipboardFormats());
     }
 }
+
