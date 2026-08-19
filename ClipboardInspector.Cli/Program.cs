@@ -9,7 +9,7 @@ internal class Program
         var formats = ClipboardFormats.GetClipboardFormatsList();
         foreach (var format in formats)
         {
-            Console.WriteLine($"ID: {format.Id}, Name: {format.Name}");
+            Console.WriteLine($"ID: {format.Id}, Name: {format.Name}, Category: {format.Category}, Backing: {format.Backing}");
         }
     }
 }

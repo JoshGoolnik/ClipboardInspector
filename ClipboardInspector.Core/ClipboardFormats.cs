@@ -1,5 +1,7 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Formats.Asn1;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using ClipboardInspector.Core.Enums;
 [assembly: DisableRuntimeMarshalling]
 namespace ClipboardInspector.Core
 {
@@ -20,7 +22,7 @@ namespace ClipboardInspector.Core
         private static partial int GetClipboardFormatName(
         uint format, [Out] char[] lpszFormatName, int cchMaxCount);
 
-        public sealed record ClipboardFormat(uint Id, string Name);
+        public sealed record ClipboardFormat(uint Id, string Name, FormatCategory Category, ClipboardBacking Backing);
 
         public static IReadOnlyList<ClipboardFormat> GetClipboardFormatsList()
         {
@@ -34,7 +36,7 @@ namespace ClipboardInspector.Core
                 uint format = 0;
                 while ((format = EnumClipboardFormats(format)) != 0)
                 {
-                    formats.Add(new ClipboardFormat(format, GetFormatName(format)));
+                    formats.Add(new ClipboardFormat(format, GetFormatName(format), GetFormatCategory(format), GetBacking(format, GetFormatCategory(format))));
                 }
                 return formats;
             }
@@ -46,9 +48,9 @@ namespace ClipboardInspector.Core
 
         private static string GetFormatName(uint format)
         {
-            if (FormatHelper.PredefinedFormats.TryGetValue(format, out var known))
+            if (FormatHelper.PredefinedFormats.TryGetValue(format, out var knownFormat))
             {
-                return known;
+                return knownFormat.Name;
             }
 
             var buffer = new char[256];
@@ -58,5 +60,26 @@ namespace ClipboardInspector.Core
                 ? new string(buffer, 0, length)
                 : $"Unknown (0x{format:X4})";
         }
+
+        private static FormatCategory GetFormatCategory(uint format) => format switch
+        {
+            >= 0x0001 and <= 0x0011 => FormatCategory.Predefined,
+            >= 0x0200 and <= 0x02FF => FormatCategory.PrivateApplication,
+            >= 0x0300 and <= 0x03FF => FormatCategory.GdiObject,
+            >= 0xC000 and <= 0xFFFF => FormatCategory.Registered,
+            _ => FormatCategory.Unknown,
+        };
+
+        private static ClipboardBacking GetBacking(uint format, FormatCategory category) => category switch
+        {
+            // If pre-defined, check if we have a known backing type; otherwise, return Unknown.
+            FormatCategory.Predefined => FormatHelper.PredefinedFormats.TryGetValue(format, out var info)
+                ? info.Backing
+                : ClipboardBacking.Unknown,
+            FormatCategory.Registered => ClipboardBacking.GlobalMemory,
+            FormatCategory.PrivateApplication => ClipboardBacking.GlobalMemory,
+            FormatCategory.GdiObject => ClipboardBacking.GdiHandle,
+            _ => ClipboardBacking.Unknown,
+        };
     }
 }
