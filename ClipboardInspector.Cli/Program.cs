@@ -6,7 +6,11 @@ internal class Program
 {
     private static void Main()
     {
-        Console.WriteLine(InspectionService.GetClipboardFormats());
+        var formats = ClipboardFormats.GetClipboardFormatsList();
+        foreach (var format in formats)
+        {
+            Console.WriteLine($"ID: {format.Id}, Name: {format.Name}");
+        }
     }
 }
 

@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 [assembly: DisableRuntimeMarshalling]
 namespace ClipboardInspector.Core
 {
-    public static partial class InspectionService
+    public static partial class ClipboardFormats
     {
         [LibraryImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -19,8 +19,10 @@ namespace ClipboardInspector.Core
         [LibraryImport("user32.dll", EntryPoint = "GetClipboardFormatNameW")]
         private static partial int GetClipboardFormatName(
         uint format, [Out] char[] lpszFormatName, int cchMaxCount);
-        
-        public static string GetClipboardFormats()
+
+        public sealed record ClipboardFormat(uint Id, string Name);
+
+        public static IReadOnlyList<ClipboardFormat> GetClipboardFormatsList()
         {
             if (!OpenClipboard(IntPtr.Zero))
             {
@@ -28,19 +30,20 @@ namespace ClipboardInspector.Core
             }
             try
             {
-                var formats = new List<string>();
+                var formats = new List<ClipboardFormat>();
                 uint format = 0;
                 while ((format = EnumClipboardFormats(format)) != 0)
                 {
-                    formats.Add(GetFormatName(format));
+                    formats.Add(new ClipboardFormat(format, GetFormatName(format)));
                 }
-                return string.Join(Environment.NewLine, formats);
+                return formats;
             }
             finally
             {
                 CloseClipboard();
             }
         }
+
         private static string GetFormatName(uint format)
         {
             if (FormatHelper.PredefinedFormats.TryGetValue(format, out var known))
