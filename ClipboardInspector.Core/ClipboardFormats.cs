@@ -70,14 +70,13 @@ namespace ClipboardInspector.Core
             _ => FormatCategory.Unknown,
         };
 
-        private static ClipboardBacking GetBacking(uint format, FormatCategory category) => category switch
-        {
-            // If pre-defined, check if we have a known backing type; otherwise, return Unknown.
-            FormatCategory.Predefined => FormatHelper.PredefinedFormats.TryGetValue(format, out var info)
+        private static ClipboardBacking GetBacking(uint format, FormatCategory category) => FormatHelper.PredefinedFormats.TryGetValue(format, out var info)
                 ? info.Backing
-                : ClipboardBacking.Unknown,
-            FormatCategory.Registered => ClipboardBacking.GlobalMemory,
-            FormatCategory.PrivateApplication => ClipboardBacking.GlobalMemory,
+                : GetBackingFromCategory(category);
+
+        private static ClipboardBacking GetBackingFromCategory(FormatCategory category) => category switch
+        {
+            FormatCategory.Registered or FormatCategory.PrivateApplication => ClipboardBacking.GlobalMemory,
             FormatCategory.GdiObject => ClipboardBacking.GdiHandle,
             _ => ClipboardBacking.Unknown,
         };

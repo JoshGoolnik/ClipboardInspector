@@ -27,6 +27,11 @@ namespace ClipboardInspector.Core
             [0x000F] = new FormatInfo("CF_HDROP", ClipboardBacking.Structure),
             [0x0010] = new FormatInfo("CF_LOCALE", ClipboardBacking.GlobalMemory),
             [0x0011] = new FormatInfo("CF_DIBV5", ClipboardBacking.GlobalMemory),
+            [0x0080] = new FormatInfo("CF_OWNERDISPLAY", ClipboardBacking.GdiHandle),
+            [0x0081] = new FormatInfo("CF_DSPTEXT", ClipboardBacking.GlobalMemory),
+            [0x0082] = new FormatInfo("CF_DSPBITMAP", ClipboardBacking.GdiHandle),
+            [0x0083] = new FormatInfo("CF_DSPMETAFILEPICT", ClipboardBacking.Structure),
+            [0x008E] = new FormatInfo("CF_DSPENHMETAFILE", ClipboardBacking.GdiHandle)
         };
     }
 }
