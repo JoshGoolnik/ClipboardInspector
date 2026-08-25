@@ -1,7 +1,7 @@
-﻿using System.Formats.Asn1;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using ClipboardInspector.Core.Enums;
+using ClipboardInspector.Core.Entities;
 [assembly: DisableRuntimeMarshalling]
 namespace ClipboardInspector.Core
 {
@@ -15,14 +15,25 @@ namespace ClipboardInspector.Core
         [return: MarshalAs(UnmanagedType.Bool)]
         private static partial bool CloseClipboard();
 
-        [LibraryImport("user32.dll")]
+        [LibraryImport("user32.dll", SetLastError = true)]
         private static partial uint EnumClipboardFormats(uint format);
 
         [LibraryImport("user32.dll", EntryPoint = "GetClipboardFormatNameW")]
         private static partial int GetClipboardFormatName(
         uint format, [Out] char[] lpszFormatName, int cchMaxCount);
 
-        public sealed record ClipboardFormat(uint Id, string Name, FormatCategory Category, ClipboardBacking Backing);
+        [LibraryImport("user32.dll", SetLastError = true)]
+        private static partial IntPtr GetClipboardData(uint uFormat);
+
+        [LibraryImport("kernel32.dll", SetLastError = true)]
+        private static partial IntPtr GlobalLock(IntPtr hMem);
+
+        [LibraryImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static partial bool GlobalUnlock(IntPtr hMem);
+
+        [LibraryImport("kernel32.dll", SetLastError = true)]
+        private static partial nuint GlobalSize(IntPtr hMem);
 
         public static IReadOnlyList<ClipboardFormat> GetClipboardFormatsList()
         {
@@ -36,7 +47,10 @@ namespace ClipboardInspector.Core
                 uint format = 0;
                 while ((format = EnumClipboardFormats(format)) != 0)
                 {
-                    formats.Add(new ClipboardFormat(format, GetFormatName(format), GetFormatCategory(format), GetBacking(format, GetFormatCategory(format))));
+                    var formatName = GetFormatName(format);
+                    var formatCategory = GetFormatCategory(format);
+                    var backing = GetBacking(format, formatCategory);
+                    formats.Add(new ClipboardFormat(format, formatName, formatCategory, backing));
                 }
                 return formats;
             }
@@ -45,6 +59,55 @@ namespace ClipboardInspector.Core
                 CloseClipboard();
             }
         }
+
+        public static byte[]? GetData(uint format)
+        {
+            if (GetBacking(format, GetFormatCategory(format)) != ClipboardBacking.GlobalMemory)
+            {
+                return null;
+            }
+
+            if (!OpenClipboard(IntPtr.Zero))
+            {
+                throw new InvalidOperationException("Failed to open clipboard.");
+            }
+
+            try
+            {
+                return GetClipboardDataBytes(format);
+            }
+            finally
+            {
+                CloseClipboard();
+            }
+        }
+
+        private static byte[]? GetClipboardDataBytes(uint format)
+        {
+
+            IntPtr hData = GetClipboardData(format);
+            if (hData == IntPtr.Zero)
+            {
+                return null;
+            }
+            IntPtr pData = GlobalLock(hData);
+            if (pData == IntPtr.Zero)
+            {
+                throw new InvalidOperationException($"Failed to lock global memory for format {format}.");
+            }
+            try
+            {
+                nuint size = GlobalSize(hData);
+                byte[] buffer = new byte[size];
+                Marshal.Copy(pData, buffer, 0, (int)size);
+                return buffer;
+            }
+            finally
+            {
+                GlobalUnlock(hData);
+            }
+        }
+
 
         private static string GetFormatName(uint format)
         {
