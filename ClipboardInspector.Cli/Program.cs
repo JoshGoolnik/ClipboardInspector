@@ -7,11 +7,11 @@ internal class Program
 {
     private static void Main()
     {
-        var formats = ClipboardFormats.GetClipboardFormatsList();
+        var formats = ClipboardEnumeration.GetClipboardFormatsList();
         foreach (var format in formats)
         {
             Console.WriteLine($"ID: {format.Id}, Name: {format.Name}, Category: {format.Category}, Backing: {format.Backing}");
-            var data = ClipboardFormats.GetData(format.Id);
+            var data = ClipboardEnumeration.GetData(format.Id);
 
             if (data is null)
             {
