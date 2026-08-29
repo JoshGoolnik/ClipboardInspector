@@ -57,4 +57,18 @@ public class ClipboardFormatTests
         Assert.Equal(ClipboardBacking.Unknown, result.Backing);
         Assert.False(ClipboardFormat.IsReadable(0x0100));
     }
+
+    [Theory]
+    [InlineData(0x0001u, FormatCategory.Predefined, ClipboardBacking.GlobalMemory)]
+    [InlineData(0x0011u, FormatCategory.Predefined, ClipboardBacking.GlobalMemory)]
+    [InlineData(0x0012u, FormatCategory.Unknown, ClipboardBacking.Unknown)]
+    [InlineData(0xBFFFu, FormatCategory.Unknown, ClipboardBacking.Unknown)]
+    [InlineData(0xC000u, FormatCategory.Registered, ClipboardBacking.GlobalMemory)]
+    public void FromId_ClassifiesBoundaryIds(uint id, FormatCategory category, ClipboardBacking backing)
+    {
+        var result = ClipboardFormat.FromId(id, "test");
+
+        Assert.Equal(category, result.Category);
+        Assert.Equal(backing, result.Backing);
+    }
 }
