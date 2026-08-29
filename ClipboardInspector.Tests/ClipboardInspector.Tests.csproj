@@ -18,4 +18,8 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ClipboardInspector.Core\ClipboardInspector.Core.csproj" />
+  </ItemGroup>
+
 </Project>
