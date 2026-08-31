@@ -48,7 +48,7 @@ public static partial class ClipboardEnumeration
 
     private static string GetFormatName(uint format)
     {
-        if (PredefinedFormats.PredefinedFormats.TryGetValue(format, out var knownFormat))
+        if (PredefinedFormats.All.TryGetValue(format, out var knownFormat))
         {
             return knownFormat.Name;
         }

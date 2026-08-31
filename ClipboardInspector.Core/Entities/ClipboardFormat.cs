@@ -16,7 +16,7 @@ public sealed record ClipboardFormat(uint Id, string Name, FormatCategory Catego
         return new ClipboardFormat(id, name, category, backing);
     }
 
-    private static ClipboardBacking GetBacking(uint format, FormatCategory category) => PredefinedFormats.PredefinedFormats.TryGetValue(format, out var info)
+    private static ClipboardBacking GetBacking(uint format, FormatCategory category) => PredefinedFormats.All.TryGetValue(format, out var info)
         ? info.Backing
         : GetBackingFromCategory(category);
 
@@ -29,7 +29,7 @@ public sealed record ClipboardFormat(uint Id, string Name, FormatCategory Catego
 
     private static FormatCategory GetFormatCategory(uint format)
     {
-        return PredefinedFormats.PredefinedFormats.ContainsKey(format)
+        return PredefinedFormats.All.ContainsKey(format)
             ? FormatCategory.Predefined
             : format switch
             {

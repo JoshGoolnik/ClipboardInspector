@@ -8,7 +8,7 @@ namespace ClipboardInspector.Core
     internal static class PredefinedFormats
     {
         public sealed record FormatInfo(string Name, ClipboardBacking Backing);
-        public static readonly Dictionary<uint, FormatInfo> AllPredefinedFormats = new()
+        public static readonly Dictionary<uint, FormatInfo> All = new()
         {
             [0x0001u] = new FormatInfo("CF_TEXT", ClipboardBacking.GlobalMemory),
             [0x0002u] = new FormatInfo("CF_BITMAP", ClipboardBacking.GdiHandle),
