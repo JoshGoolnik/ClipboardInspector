@@ -9,14 +9,14 @@ public sealed record ClipboardFormat(uint Id, string Name, FormatCategory Catego
     GetBacking(id, GetFormatCategory(id)) == ClipboardBacking.GlobalMemory;
 
     // Factory method to create a ClipboardFormat instance from an ID and name
-    public static ClipboardFormat FromId(uint id, string name) 
-    { 
+    public static ClipboardFormat FromId(uint id, string name)
+    {
         var category = GetFormatCategory(id);
         var backing = GetBacking(id, category);
         return new ClipboardFormat(id, name, category, backing);
     }
 
-    private static ClipboardBacking GetBacking(uint format, FormatCategory category) => FormatHelper.PredefinedFormats.TryGetValue(format, out var info)
+    private static ClipboardBacking GetBacking(uint format, FormatCategory category) => PredefinedFormats.PredefinedFormats.TryGetValue(format, out var info)
         ? info.Backing
         : GetBackingFromCategory(category);
 
@@ -27,12 +27,17 @@ public sealed record ClipboardFormat(uint Id, string Name, FormatCategory Catego
         _ => ClipboardBacking.Unknown,
     };
 
-    private static FormatCategory GetFormatCategory(uint format) => format switch
+    private static FormatCategory GetFormatCategory(uint format)
     {
-        >= 0x0001 and <= 0x0011 => FormatCategory.Predefined,
-        >= 0x0200 and <= 0x02FF => FormatCategory.PrivateApplication,
-        >= 0x0300 and <= 0x03FF => FormatCategory.GdiObject,
-        >= 0xC000 and <= 0xFFFF => FormatCategory.Registered,
-        _ => FormatCategory.Unknown,
-    };
+        return PredefinedFormats.PredefinedFormats.ContainsKey(format)
+            ? FormatCategory.Predefined
+            : format switch
+            {
+                >= 0x0001 and <= 0x0011 => FormatCategory.Predefined,
+                >= 0x0200 and <= 0x02FF => FormatCategory.PrivateApplication,
+                >= 0x0300 and <= 0x03FF => FormatCategory.GdiObject,
+                >= 0xC000 and <= 0xFFFF => FormatCategory.Registered,
+                _ => FormatCategory.Unknown,
+            };
+    }
 }

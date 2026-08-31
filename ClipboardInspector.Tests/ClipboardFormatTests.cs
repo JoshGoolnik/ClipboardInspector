@@ -71,4 +71,14 @@ public class ClipboardFormatTests
         Assert.Equal(category, result.Category);
         Assert.Equal(backing, result.Backing);
     }
+
+    [Theory]
+    [InlineData (0x0002u, "CF_BITMAP", FormatCategory.Predefined, ClipboardBacking.GdiHandle)]
+    [InlineData (0x0081u, "CF_DSPTEXT", FormatCategory.Predefined, ClipboardBacking.GlobalMemory)]
+    public void FromId_DictionarySpecificFormat_ReturnsCorrectBacking(uint id, string name, FormatCategory category, ClipboardBacking backing)
+    {
+        var result = ClipboardFormat.FromId(id, name);
+        Assert.Equal(category, result.Category);
+        Assert.Equal(backing, result.Backing);
+    }
 }
