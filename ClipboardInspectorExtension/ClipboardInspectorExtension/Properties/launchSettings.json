@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "ClipboardInspectorExtension (Package)": {
+      "commandName": "MsixPackage",
+      "doNotLaunchApp": true
+    },
+    "ClipboardInspectorExtension (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
