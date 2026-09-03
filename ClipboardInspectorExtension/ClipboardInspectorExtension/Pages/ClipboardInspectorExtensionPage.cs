@@ -30,29 +30,8 @@ internal sealed partial class ClipboardInspectorExtensionPage : ListPage
             {
                 Title = f.Name,
                 Subtitle = $"{f.Id} · {f.Category} · {f.Backing}",
-                Details = new Details
-                {
-                    Title = f.Name,
-                    Body = BuildBody(f),
-                }
+                Details = new LazyDetails(f)
             })
             .ToArray();
-    }
-
-    private static string BuildBody(ClipboardFormat format)
-    {
-        if (!ClipboardFormat.IsReadable(format.Id))
-        {
-            return $"Not readable — backed by {format.Backing}.";
-        }
-
-        var data = ClipboardEnumeration.GetData(format.Id);
-
-        if (data is null)
-        {
-            return "No data — the owning application did not render this format.";
-        }
-
-        return $"{data.Length:N0} bytes\n\n```\n{HexDump.ToHexDump(data)}```";
     }
 }
