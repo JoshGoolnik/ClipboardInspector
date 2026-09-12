@@ -13,7 +13,7 @@ public partial class ClipboardInspectorExtensionCommandsProvider : CommandProvid
 
     public ClipboardInspectorExtensionCommandsProvider()
     {
-        DisplayName = "Clipboard Inspector";
+        DisplayName = "Clipboard Data Inspector";
         Icon = IconHelpers.FromRelativePath("Assets\\StoreLogo.png");
         _commands = [
             new CommandItem(new ClipboardInspectorExtensionPage()) { Title = DisplayName },

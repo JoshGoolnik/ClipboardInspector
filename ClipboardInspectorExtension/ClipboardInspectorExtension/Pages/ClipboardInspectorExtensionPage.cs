@@ -16,7 +16,7 @@ internal sealed partial class ClipboardInspectorExtensionPage : ListPage
     public ClipboardInspectorExtensionPage()
     {
         Icon = IconHelpers.FromRelativePath("Assets\\StoreLogo.png");
-        Title = "Clipboard Inspector";
+        Title = "Clipboard Data Inspector";
         Name = "Open";
         ShowDetails = true;
     }
