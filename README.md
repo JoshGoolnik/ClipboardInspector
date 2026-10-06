@@ -18,3 +18,6 @@ If you'd like to install the finished product just follow these steps:
 Feel free to use the [Discussions](https://github.com/JoshGoolnik/ClipboardInspector/discussions) tab for general questions, or the [Issues](https://github.com/JoshGoolnik/ClipboardInspector/issues) tab if you spot any bugs!
 
 I very much doubt there will be any questions or issues, but hey, the places are there just in case.
+
+## ✍️ Authors
+This extension was written by [Josh Goolnik](https://www.joshgoolnik.com).
